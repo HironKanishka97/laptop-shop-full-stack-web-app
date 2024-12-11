@@ -1,0 +1,162 @@
+<div class="container mt-3">
+  <div class="d-flex justify-content-between"><p class="h2 text-center">Product List</p>
+    <button class="btn btn-primary float-end" type="button" (click)="openModal(1)">
+      Add New Product</button>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mt-3" *ngFor="let p of products">
+      <div class="card w-100 h-100">
+        <div class="card-body">
+          <h5 class="card-title mb-2 text-center fw-bold">
+            {{ "Product Id : " + p.id + " - "}}  {{p.name }}
+          </h5>
+          <div class="fw-bold">Details</div>
+          <ul class="list-group-item w-100">
+            <div class="mx-4 ">
+              Brand : {{ p.brand }}
+            </div>
+            <div class="mx-4 ">
+              Description : {{ p.description }}
+            </div>
+            <div class="mx-4">
+              Price : {{p.price }} $
+            </div>
+            <div class="mx-4 r">
+              Quantity : Only {{p.quantity }} left
+            </div>
+            <div class="mx-4 text-warning fw-bold">
+              Re Order Point :  {{p.rop }}
+              <p *ngIf=" p.quantity -p.rop <= 3" class="text-danger"> Consider Restocking
+                <i class="bi bi-exclamation-diamond-fill"></i></p>
+            </div>
+          </ul>
+          <img [src]="loadedImageUrl(p.image)" id="imageDisplay" alt="Uploaded Image"
+               style="max-width: 150px; max-height: 150px;" />
+        </div>
+
+        <div class="d-flex gap-1 justify-content-end mb-1 mx-1">
+          <button type="button" class="btn btn-warning" (click)="openModal(2,p)">Update</button>
+          <button type="button" class="btn btn-danger " (click)="openModal(2,p)">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--modal-->
+<div id="modal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Product Update</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="productForm">
+
+          <div class="mt-3">
+            <label for="name">Product Name:</label>
+            <input id="name" formControlName="name"
+                   class="form-control"
+                   [ngClass]="{'is-invalid': productForm.get('name')?.invalid && productForm.get('name')?.touched}">
+
+            <div *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched" class="text-danger">
+              Product Name is required
+            </div>
+          </div>
+          <div class="mt-3">
+            <label for="brand">Product Brand:</label>
+            <input id="brand" formControlName="brand"
+                   class="form-control"
+                   [ngClass]="{'is-invalid': productForm.get('brand')?.invalid && productForm.get('brand')?.touched}">
+
+            <div *ngIf="productForm.get('brand')?.invalid && productForm.get('brand')?.touched" class="text-danger">
+              Product Brand is required
+            </div>
+          </div>
+          <div class="mt-3">
+            <label for="description">Product Description:</label>
+            <input id="description" formControlName="description"
+                   class="form-control"
+                   [ngClass]="{'is-invalid': productForm.get('description')?.invalid && productForm.get('description')?.touched}">
+
+            <div *ngIf="productForm.get('description')?.invalid && productForm.get('description')?.touched" class="text-danger">
+              Product Description is required
+            </div>
+          </div>
+          <div class="mt-3">
+            <label for="price">Product price:</label>
+            <input id="price" formControlName="price"
+                   class="form-control"
+                   [ngClass]="{'is-invalid': productForm.get('price')?.invalid && productForm.get('price')?.touched}">
+
+            <div *ngIf="productForm.get('price')?.invalid && productForm.get('price')?.touched" class="text-danger">
+              Product price is required
+            </div>
+          </div>
+          <div class="mt-3">
+            <label for="quantity">Product Quantity:</label>
+            <input id="quantity" formControlName="quantity"
+                   class="form-control"
+                   [ngClass]="{'is-invalid': productForm.get('quantity')?.invalid && productForm.get('quantity')?.touched}">
+
+            <div *ngIf="productForm.get('quantity')?.invalid && productForm.get('quantity')?.touched" class="text-danger">
+              Product Quantity is required
+            </div>
+          </div>
+          <div class="mt-3">
+            <label for="rop">Product Re Order Point:</label>
+            <input id="rop" formControlName="rop"
+                   class="form-control"
+                   [ngClass]="{'is-invalid': productForm.get('rop')?.invalid && productForm.get('rop')?.touched}">
+
+            <div *ngIf="productForm.get('rop')?.invalid && productForm.get('rop')?.touched" class="text-danger">
+              Product ROP is required
+            </div>
+          </div>
+
+          <div id="imgpanel" class="mt-3">
+            <label for="image">Product Image:</label>
+            <img [src]="imageRMUrl" style="max-width: 100px; max-height: 100px">
+            <input id="image" hidden="hidden" (change)="selectImage($event)" Select type="file"
+                   formControlName="image" class="form-control"
+                   [ngClass]="{'is-invalid': productForm.get('image')?.invalid && productForm.get('image')?.touched}">
+            <label class="btn btn-success" for="image" id="selectbutton">Select Image</label>
+            <label class="btn btn-warning mx-1" id="clearbutton" (click)="clearImage()">Clear</label>
+            <div *ngIf="productForm.get('image')?.invalid && productForm.get('image')?.touched" class="text-danger">
+              Product Image is required
+            </div>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button  *ngIf="enaAdd" type="button" class="btn btn-primary" (click)="addProduct()">Add Product</button>
+        <button  *ngIf="!enaAdd" type="button" class="btn btn-primary" (click)="updateProduct()">Update Product</button>
+        <button *ngIf="!enaAdd" type="button" class="btn btn-danger" (click)="deleteProductModal()">Delete Product</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--confirmationmodal-->
+<div id="confirmModal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you Sure To Delete This Product ? Then Press Delete
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="deleteProduct()">Delete Now</button>
+      </div>
+    </div>
+  </div>
+</div>

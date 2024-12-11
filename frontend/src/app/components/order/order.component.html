@@ -1,0 +1,179 @@
+<div class="container mt-3">
+  <p class="h2 text-center">Order List</p>
+
+  <div class="row">
+    <div class="col-md-6 mt-3" *ngFor="let o of orderList">
+      <div class="card w-100 h-100">
+        <div class="card-body">
+          <h5 class="card-title mb-2 text-center">
+            {{ "Order Id : " + o.id + " - " + o.client.name }}
+          </h5>
+
+          <div class="fw-bold">Products in Order</div>
+          <ul class="list-group-item w-100"
+              *ngFor="let ci of o.cartItems">
+            <div class="ms-2 me-auto d-flex justify-content-between align-items-start">
+              {{ ci.product.name }}
+              <span class="badge text-bg-primary">{{ ci.totalCount }}</span>
+            </div>
+            <div class="mx-4">
+              {{ ci.product.description }}
+            </div>
+          </ul>
+          <p class=" ">Order Date: {{ o.date | date}}</p>
+          <p class="text-danger text-center">Order Total: {{ o.lineTotal }}</p>
+        </div>
+
+        <div class="d-flex gap-1 justify-content-end mb-1 mx-1">
+          <button type="button" class="btn btn-warning" (click)="openModal(o)">Update</button>
+          <button type="button" class="btn btn-danger " (click)="openModal(o)">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--modal-->
+<div id="modal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Order Update</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="orderForm">
+
+          <div>
+            <label for="date">Date:</label>
+            <input id="date" formControlName="date" type="date" class="form-control">
+          </div>
+
+          <div class="mt-3">
+            <label for="client">Select Client:</label>
+            <select id="client" formControlName="client"
+                    class="form-control"
+                    [ngClass]="{'is-invalid': orderForm.get('client')?.invalid && orderForm.get('client')?.touched}">
+              <option value="">-- Select a Client --</option>
+              <option *ngFor="let c of clients" [ngValue]="c">{{ c.name }}</option>
+            </select>
+
+            <div *ngIf="orderForm.get('client')?.invalid && orderForm.get('client')?.touched" class="text-danger">
+              Client selection is required
+            </div>
+          </div>
+
+          <div class="d-flex flex-column ">
+            <div>
+              <table class="table">
+                <thead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Count</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor=" let ci of cartItems">
+                  <td>
+                    {{ ci.product.name }}
+                  </td>
+                  <td>
+                    {{ ci.totalCount }}
+                  </td>
+                  <td>{{ ci.total }}</td>
+                <td>
+                  <button type="button" class="btn btn-sm  btn-warning "
+                          (click)="editCartModal(1,ci)">Edit
+                  </button>
+                  <span class="mx-1"></span>
+                  <button type="button" class="btn btn-sm  btn-danger "
+                          (click)="deleteProductFromOrder(ci)">Delete
+                  </button>
+                </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <button type="button" class="btn btn-sm w-25 btn-dark float-end align-self-end"
+                    (click)="editCartModal(2)">Add Product
+            </button>
+          </div>
+
+          <div>
+            <label for="lineTotal">Line Total:</label>
+            <input id="lineTotal" formControlName="lineTotal" type="text" class="form-control" readonly>
+          </div>
+
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="updateOrder()">Update Order</button>
+        <button type="button" class="btn btn-danger" (click)="deleteOrderModal()">Delete Order</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--confirmationmodal-->
+<div id="confirmModal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you Sure To Delete This Order ? Then Press Delete
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="deleteOrder()">Delete Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--edit cart modal-->
+<div id="editCartModal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Order Items</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <form [formGroup]="cartform">
+
+            <div >
+              <label for="product">Select Product:</label>
+              <select id="product" formControlName="product"
+                      class="form-control"
+                      [ngClass]="{'is-invalid': orderForm.get('product')?.invalid && orderForm.get('product')?.touched}">
+                <option value="">-- Select a Product --</option>
+                <option *ngFor="let p of products" [ngValue]="p">{{ p.name }}</option>
+              </select>
+
+              <div *ngIf="orderForm.get('product')?.invalid && orderForm.get('product')?.touched" class="text-danger">
+                Product selection is required
+              </div>
+            </div>
+            <div>
+              <label for="totalCount">Quantity:</label>
+              <input id="totalCount" formControlName="totalCount" type="text" class="form-control">
+            </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="editCartItems()">{{edit ? "Edit" : "Add" }}</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="container-fluid text-center bg-light py-4">
+  <h2 class="text-dark">Your Cart</h2>
+  <div class="row">
+    <div *ngIf="cartItems.length === 0" class="alert alert-warning">Your cart is empty</div>
+    <div *ngFor="let item of cartItemsWithCount" class="col-4">
+      <div class=" p-3 d-flex border border-1 shadow-sm mt-3">
+        <img id="productimg" [src]="loadImage(item.product.image)" class="" alt="image">
+        <div class="container pt-1">
+          <h5 class="fw-bold">{{ item.product.name }}</h5>
+          <p class="">{{ item.product.description }} $</p>
+          <p class="">{{ item.product.price }} $</p>
+          <p class="fw-bold">Count : {{ item.totalCount }} </p>
+          <p class="fw-bold">Total : {{ item.totalCount * item.product.price }} </p>
+
+        </div>
+        <div>
+          <button class="btn btn-danger btn-sm float-end" (click)="removeFromCart(item.product)">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex w-100 justify-content-center my-5 mx-3">
+    <div class="d-flex justify-content-center align-items-center">
+      <span class="me-2">New Client?</span>
+      <button class="btn btn-outline-primary btn-md" (click)="addNewClient()">Add New Client</button>
+    </div>
+    <div class="mx-3"></div>
+    <div class="d-flex justify-content-center align-items-center">
+      <span class="me-2">Existing Client?</span>
+      <button class="btn btn-primary btn-md" (click)="proceedToOrder()">Proceed to Order</button>
+    </div>
+  </div>
+
+
+</div>
+
+<!--order modal-->
+<div id="orderModal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">New Order</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="orderForm">
+          <div>
+            <label for="date">Date:</label>
+            <input id="date" formControlName="date" type="date" class="form-control" readonly>
+          </div>
+
+          <div class="mt-3">
+            <label for="client">Select Client:</label>
+            <select  id="client" formControlName="client"
+                    class="form-control"
+                    [ngClass]="{'is-invalid': orderForm.get('client')?.invalid && orderForm.get('client')?.touched}">
+              <option value="">-- Select a Client --</option>
+              <option *ngFor="let client of clients" [ngValue]="client">{{ client.name }}</option>
+            </select>
+
+            <div *ngIf="orderForm.get('client')?.invalid && orderForm.get('client')?.touched" class="text-danger">
+              Client selection is required
+            </div>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="placeOrder()">Place Order</button>
+      </div>
+    </div>
+  </div>
+</div>

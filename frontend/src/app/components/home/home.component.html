@@ -1,0 +1,62 @@
+<nav class="position-fixed top-0 start-0 z-2 navbar navbar-expand navbar-dark bg-dark w-100">
+  <div class="container-fluid">
+    <a class="navbar-brand">Hk-Lapstore</a>
+
+    <div class=" navbar-collapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLinkActive="active" routerLink="/dashboard">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLinkActive="active" routerLink="/product">Products</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLinkActive="active" routerLink="/client">Client</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLinkActive="active" routerLink="/order">Orders</a>
+        </li>
+      </ul>
+      <div class="d-flex gap-5">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" routerLinkActive="active" routerLink="/cart">Cart</a>
+          </li>
+        </ul>
+        <div class="d-flex gap-3">
+          <button *ngIf="!loggedUser" class="btn btn-outline-info" type="button" (click)="logInAgain()">
+            Log In
+          </button>
+          <button class="btn btn-outline-warning" type="button" (click)="loadModal()">
+            Log Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+<div *ngIf="!loggedUser" class="text-center alert alert-warning" role="alert">
+  {{ loggedUserMsg }}
+</div>
+
+<div class="content" style="padding-top: 70px;">
+  <router-outlet></router-outlet>
+</div>
+
+<div class="modal" tabindex="-1" id="logoutModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Please press <p class="d-inline text-danger">Logout</p> to Log out
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
